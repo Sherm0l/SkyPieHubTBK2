@@ -228,7 +228,7 @@ end
 
 local farmButton = createButton("Farm: OFF", 20)
 local digButton = createButton("Auto Dig: OFF", 80)
-local dispencersButton = createButton("Auto Dispencers: OFF", 140)
+local dispencersButton = createButton("Auto Dispensers: OFF", 140)
 
 local tokensFolder = workspace:WaitForChild("Rendered Models"):WaitForChild("Tokens")
 
@@ -387,7 +387,7 @@ end)
 
 dispencersButton.MouseButton1Click:Connect(function()
 	dispencersEnabled = not dispencersEnabled
-	dispencersButton.Text = dispencersEnabled and "Auto Dispencers: ON" or "Auto Dispencers: OFF"
+	dispencersButton.Text = dispencersEnabled and "Auto Dispensers: ON" or "Auto Dispensers: OFF"
 end)
 
 local targetPos = UDim2.new(0.5, 0, 0.5, 0)
