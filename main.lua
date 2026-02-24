@@ -190,7 +190,7 @@ local discordButton = createButton1("Discord", 20)
 
 discordButton.MouseButton1Click:Connect(function()
 	if setclipboard then
-		setclipboard("https://discord.gg/DSVPXC2a")
+		setclipboard("https://discord.gg/p88BhThHZh")
 		discordButton.Text = "Copied!"
 		task.wait(1.5)
 		discordButton.Text = "Discord"
