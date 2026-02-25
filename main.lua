@@ -2,6 +2,12 @@
 local TweenService = game:GetService("TweenService")
 local player = game:GetService("Players").LocalPlayer
 
+player.Idled:Connect(function()
+	local VirtualUser = game:GetService("VirtualUser")
+	VirtualUser:CaptureController()
+	VirtualUser:ClickButton2(Vector2.new())
+end)
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "SkypieHub"
 screenGui.ResetOnSpawn = false
@@ -218,9 +224,10 @@ local fields = {
 	["Pepper"] = Vector3.new(-572, 136, 188),
 	["Moonflower"] = Vector3.new(-582, 144, -276),
 	["Dark Forest"] = Vector3.new(-863, 135, -188),
-	["Lotus"] = Vector3.new(-209, 130, 839),
+	["Water Lily"] = Vector3.new(-209, 130, 839),
 	["Crystals"] = Vector3.new(-643, -54, 36),
 	["Blackberry"] = Vector3.new(-194, 34, 173),
+	["Corn"] = Vector3.new(57, 28, 165),
 }
 
 local fieldNames = {
@@ -289,12 +296,13 @@ fieldMainButton.Parent = mainTab
 
 Instance.new("UICorner", fieldMainButton).CornerRadius = UDim.new(0,8)
 
-local dropdownFrame = Instance.new("Frame")
+local dropdownFrame = Instance.new("ScrollingFrame")
 dropdownFrame.Size = UDim2.new(0, 150, 0, 0)
 dropdownFrame.Position = UDim2.new(0, 200, 0, 55)
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(50,50,70)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
 dropdownFrame.Visible = false
 dropdownFrame.ClipsDescendants = true
+dropdownFrame.ScrollingEnabled = true
 dropdownFrame.Parent = mainTab
 
 Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,8)
