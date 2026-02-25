@@ -453,7 +453,7 @@ task.spawn(function()
 					state = "Hive"
 					local myHive = getMyHive()
 					if myHive then
-						hrp.CFrame = myHive.Pad.Main.CFrame
+						hrp.CFrame = myHive.Pad.Main.CFrame * CFrame.new(0, 4, 0)
 					end
 					task.wait(1)
 					convertEvent:FireServer()
