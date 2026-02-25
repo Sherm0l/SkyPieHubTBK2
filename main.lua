@@ -190,7 +190,7 @@ local discordButton = createButton1("Discord", 20)
 
 discordButton.MouseButton1Click:Connect(function()
 	if setclipboard then
-		setclipboard("https://discord.gg/p88BhThHZh")
+		setclipboard("https://discord.gg/DSVPXC2a")
 		discordButton.Text = "Copied!"
 		task.wait(1.5)
 		discordButton.Text = "Discord"
@@ -200,6 +200,49 @@ discordButton.MouseButton1Click:Connect(function()
 		discordButton.Text = "Discord"
 	end
 end)
+
+-- === FIELD SELECT SYSTEM ===
+
+local selectedField = "Tulip"
+
+local fields = {
+	["Peach"] = Vector3.new(-200, 22, 46),
+	["Mint"] = Vector3.new(78, 3, 54),
+	["Daffodil"] = Vector3.new(85, 3, -49),
+	["Cranberry"] = Vector3.new(233, 14, -55),
+	["Vanilla"] = Vector3.new(294, 14, 78),
+	["Cornflower"] = Vector3.new(155, 14, 81),
+	["Rose"] = Vector3.new(-91, 28, 281),
+	["Tulip"] = Vector3.new(-117, 3, -3),
+	["Hydrangea"] = Vector3.new(-395, 123, -89),
+	["Pepper"] = Vector3.new(-572, 136, 188),
+	["Moonflower"] = Vector3.new(-582, 144, -276),
+	["Dark Forest"] = Vector3.new(-863, 135, -188),
+	["Lotus"] = Vector3.new(-209, 130, 839),
+	["Crystals"] = Vector3.new(-643, -54, 36),
+	["Blackberry"] = Vector3.new(-194, 34, 173),
+}
+
+local fieldNames = {
+	"Blackberry",
+	"Corn",
+	"Cornflower",
+	"Cranberry",
+	"Crystals",
+	"Daffodil",
+	"Dark Forest",
+	"Hydrangea",
+	"Mint",
+	"Moonflower",
+	"Peach",
+	"Pepper",
+	"Rose",
+	"Tulip",
+	"Vanilla",
+	"Water Lily"
+}
+
+local currentFieldIndex = 1
 -- === MAIN TAB CONTENT ===
 
 local mainTab = tabs["Main"]
@@ -210,12 +253,12 @@ local dispencersEnabled = false
 
 local function createButton(text, posY)
 	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0, 200, 0, 40)
+	btn.Size = UDim2.new(0, 150, 0, 30)
 	btn.Position = UDim2.new(0, 20, 0, posY)
 	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
 	btn.TextColor3 = Color3.fromRGB(255,255,255)
 	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
+	btn.TextSize = 12
 	btn.Text = text
 	btn.Parent = mainTab
 	
@@ -227,8 +270,70 @@ local function createButton(text, posY)
 end
 
 local farmButton = createButton("Farm: OFF", 20)
-local digButton = createButton("Auto Dig: OFF", 80)
-local dispencersButton = createButton("Auto Dispensers: OFF", 140)
+local digButton = createButton("Auto Dig: OFF", 60)
+local dispencersButton = createButton("Auto Dispencers: OFF", 100)
+
+-- === SAFE FIELD DROPDOWN ===
+
+local dropdownOpen = false
+
+local fieldMainButton = Instance.new("TextButton")
+fieldMainButton.Size = UDim2.new(0, 150, 0, 30)
+fieldMainButton.Position = UDim2.new(0, 200, 0, 20)
+fieldMainButton.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+fieldMainButton.TextColor3 = Color3.fromRGB(255,255,255)
+fieldMainButton.Font = Enum.Font.GothamBold
+fieldMainButton.TextSize = 12
+fieldMainButton.Text = selectedField
+fieldMainButton.Parent = mainTab
+
+Instance.new("UICorner", fieldMainButton).CornerRadius = UDim.new(0,8)
+
+local dropdownFrame = Instance.new("Frame")
+dropdownFrame.Size = UDim2.new(0, 150, 0, 0)
+dropdownFrame.Position = UDim2.new(0, 200, 0, 55)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(50,50,70)
+dropdownFrame.Visible = false
+dropdownFrame.ClipsDescendants = true
+dropdownFrame.Parent = mainTab
+
+Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,8)
+
+local layout = Instance.new("UIListLayout")
+layout.Parent = dropdownFrame
+layout.Padding = UDim.new(0,2)
+
+-- === FIELDS ===
+for name, _ in pairs(fields) do
+	local option = Instance.new("TextButton")
+	option.Size = UDim2.new(1,0,0,25)
+	option.BackgroundColor3 = Color3.fromRGB(70,70,95)
+	option.TextColor3 = Color3.fromRGB(255,255,255)
+	option.Font = Enum.Font.Gotham
+	option.TextSize = 12
+	option.Text = name
+	option.Parent = dropdownFrame
+	
+	Instance.new("UICorner", option).CornerRadius = UDim.new(0,6)
+
+	option.MouseButton1Click:Connect(function()
+		selectedField = name
+		fieldMainButton.Text = name
+		dropdownFrame.Visible = false
+		dropdownOpen = false
+	end)
+end
+
+fieldMainButton.MouseButton1Click:Connect(function()
+	dropdownOpen = not dropdownOpen
+	
+	if dropdownOpen then
+		dropdownFrame.Visible = true
+		dropdownFrame.Size = UDim2.new(0,150,0,layout.AbsoluteContentSize.Y)
+	else
+		dropdownFrame.Visible = false
+	end
+end)
 
 local tokensFolder = workspace:WaitForChild("Rendered Models"):WaitForChild("Tokens")
 
@@ -267,7 +372,33 @@ local function getMyHive()
 		end
 	end
 end
+
 -- === FARM ===
+local fieldsFolder = workspace:WaitForChild("Fields")
+
+local function isInsideHitbox(part)
+    local fieldModel = fieldsFolder:FindFirstChild(selectedField)
+    if not fieldModel then return false end
+    
+    local hitboxModel = fieldModel:FindFirstChild("Hitbox")
+    if not hitboxModel then return false end
+    
+    for _, p in ipairs(hitboxModel:GetDescendants()) do
+        if p:IsA("BasePart") then
+            local size = p.Size
+            local cf = p.CFrame
+            local localPos = cf:PointToObjectSpace(part.Position)
+            
+            if math.abs(localPos.X) <= size.X/2
+               and math.abs(localPos.Y) <= size.Y/2
+               and math.abs(localPos.Z) <= size.Z/2 then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
 task.spawn(function()
 	local state = "Idle"
 	local teleportedToField = false
@@ -280,51 +411,42 @@ task.spawn(function()
 			local progress = getProgress()
 
 			if progress.Size.X.Scale < 1 then
-				if not teleportedToField then
-					hrp.CFrame = CFrame.new(-118, 3, 0)
-					task.wait(0.5)
-					teleportedToField = true
+				if state == "Hive" then
 					state = "Field"
 				end
 
-				for _, token in ipairs(tokensFolder:GetChildren()) do
-					if not farmEnabled then break end
-					progress = getProgress()
-					if progress.Size.X.Scale >= 1 then break end
-
-					if token.Name ~= "Reward" and token.Name ~= "Honey" then
-						local part = token:FindFirstChildWhichIsA("BasePart")
-						if part then
-							local reached = false
-							local connection
-
-							connection = humanoid.MoveToFinished:Connect(function()
-								reached = true
-							end)
-
-							humanoid:MoveTo(part.Position)
-
-							local startTime = tick()
-
-							while farmEnabled and not reached do
-							if (hrp.Position - part.Position).Magnitude < 4 then
-								break
-							end
-	
-							if tick() - startTime > 2 then
-								break
-							end
-	
-							task.wait(0.1)
-							end
-
-connection:Disconnect()
-
-						end
+				if not teleportedToField then
+					local fieldPos = fields[selectedField]
+					if fieldPos then
+						hrp.CFrame = CFrame.new(fieldPos + Vector3.new(0,3,0))
 					end
+					task.wait(0.5)
+					teleportedToField = true
 				end
-			end
 
+				for _, token in ipairs(tokensFolder:GetChildren()) do
+    				if not farmEnabled then break end
+    				progress = getProgress()
+    				if progress.Size.X.Scale >= 1 then break end
+    				if state == "Hive" then break end
+
+    				local part = token:FindFirstChildWhichIsA("BasePart")
+    				if part and isInsideHitbox(part) then
+    					humanoid:MoveTo(part.Position)
+        				local startTime = tick()
+
+        				while farmEnabled do
+           					if (hrp.Position - part.Position).Magnitude < 4 then
+                			break
+            			end
+            			if tick() - startTime > 2 then
+                			break
+            			end
+            			task.wait(0.1)
+        			end
+    			end
+			end
+		end
 			if progress.Size.X.Scale >= 1 then
 				teleportedToField = false
 				if state ~= "Hive" then
@@ -342,7 +464,7 @@ connection:Disconnect()
 					progress = getProgress()
 				until progress.Size.X.Scale <= 0.01 or not farmEnabled
 
-				teleportedToField = false
+				state = "Field"
 			end
 		else
 			state = "Idle"
@@ -387,7 +509,7 @@ end)
 
 dispencersButton.MouseButton1Click:Connect(function()
 	dispencersEnabled = not dispencersEnabled
-	dispencersButton.Text = dispencersEnabled and "Auto Dispensers: ON" or "Auto Dispensers: OFF"
+	dispencersButton.Text = dispencersEnabled and "Auto Dispencers: ON" or "Auto Dispencers: OFF"
 end)
 
 local targetPos = UDim2.new(0.5, 0, 0.5, 0)
